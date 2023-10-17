@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>AH 知識圖</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:350,450,600,600,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style type="text/css">
+        html, body {
+            font: 16pt arial;
+        }
+
+        .custom-padding-button {
+            padding: 3px 6px;
+        }
+
+        #viz {
+            width: 1200px;
+            height: 900px;
+            /*border: 1px solid lightgray;*/
+            font: 12pt arial;
+        }
+        h5 {
+            font-size: 16px; /* Adjust the font size as needed */
+        }
+
+    </style>
+    <script src="https://unpkg.com/neovis.js@2.0.2"></script>
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+
+</head>
+<body onload="draw()">
+
+<!-- Page Content  -->
+<div class="container-fluid">
+    <div class="row">
+        <div id="viz" class="col-md-9"></div>
+        <nav id="sidebar" class="col-md-3">
+            <div class="p-4 pt-5">
+                <div class="mb-5">
+                    <h5>Keywords:</h5>
+                    <div class="tagcloud">
+                        <a href="#" id="load_all" class="tag-cloud-link">ALL</a>
+                        <a href="#" class="tag-cloud-link">台灣</a>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <h5>最大顯示數量:<span id="limitValue" >350</span></h5>
+                    <button class="btn btn-primary custom-padding-button limit-button" id="limit350">350</button>
+                    <button class="btn btn-primary custom-padding-button limit-button" id="limit450">450</button>
+                    <button class="btn btn-primary custom-padding-button limit-button" id="limit600">600</button>
+
+                </div>
+
+                <div class="mb-3">
+<!--                    <h5>Stabilize:</h5>-->
+                    <button class="btn btn-primary custom-padding-button" id="stabilize">固定知識圖</button>
+                </div>
+                <div class="mb-3">
+                    <h5>Concurrency:<span id="concurrenceValue" style="color: black;">2</span></h5>
+                    <input type="range" id="concurrenceSlider" name="concurrenceSlider" min="1" max="8" step="1"
+                           value="2">
+                    <!-- Element to display the slider value -->
+                </div>
+                <div class="mb-3">
+                    <h5>Time Range:</h5>
+                    <select id="timeRange">
+                        <option value="anytime">Any time</option>
+                        <option value="since2023">Since 2023</option>
+                        <option value="since2022">Since 2022</option>
+                        <option value="since2019">Since 2019</option>
+                    </select>
+                </div>
+
+
+            </div>
+
+
+        </nav>
+    </div>
+
+</div>
+
+<script>
+    config = {
+        containerId: "viz",
+        consoleDebug: false,
+        neo4j: {
+            serverUrl: "bolt://3.86.153.226:7687",
+            serverUser: "neo4j",
+            serverPassword: "combatant-sixes-oxygens"
+        },
+        visConfig: {
+            nodes: {
+                shape: 'dot' // dot,text, circle,square , ellipse, database, box,   image, circularImage, diamond, dot, star, triangle, triangleDown, hexagon, square and icon
+            },
+            edges: {
+                arrows: {
+                    to: {enabled: true}
+                }
+            },
+        },
+
+        labels: {
+            // cluster_0 to cluster_9 are the clusters
+            cluster_0: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+            cluster_1: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+            cluster_2: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+            cluster_3: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+            cluster_4: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+            cluster_5: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+            cluster_6: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+            cluster_7: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+            cluster_8: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+            cluster_9: {
+                value: "concurrency",
+                label: "name",
+                size: "concurrency",
+                group: "cluster_number",
+            },
+
+
+        },
+        relationships: {
+            cooccur_other: {
+                value: "concurrency_weight",
+                label: true,
+            },
+            cooccur_low: {
+                value: "concurrency_weight",
+                label: true,
+            },
+            cooccur_very_low: {
+                value: "concurrency_weight",
+                label: true,
+            },
+            cooccur_very_high: {
+                value: "concurrency_weight",
+                label: true,
+            },
+            cooccur_medium: {
+                value: "concurrency_weight",
+                label: true,
+            },
+            cooccur_high: {
+                value: "concurrency_weight",
+                label: true,
+
+            },
+
+        },
+        initialCypher: `MATCH p=()-[r]->() where r.concurrency_weight>=2 RETURN p LIMIT 350 `
+    };
+
+    viz;
+    limit = 350;
+    concurrence = 2;
+    years = 2019;
+    timeRange = "anytime";
+    function draw() {
+        viz = new NeoVis.default(config);
+        viz.render();
+        console.log(viz);
+
+    }
+
+    $("#stabilize").click(function () {
+        // 執行穩定操作
+        viz.stabilize();
+    });
+    $("#load_all").click(function () {
+        limit = 350;
+        // 執行查詢或觸發其他操作
+
+        executeQuery(limit, concurrence,timeRange);
+    });
+
+    // 監聽按鈕的點選事件
+    $("#limit350").click(function () {
+        // 更新 limit 的值為 350
+        limit = 350;
+        // 執行查詢或觸發其他操作
+
+        executeQuery(limit, concurrence,timeRange);
+    });
+
+    $("#limit450").click(function () {
+        // 更新 limit 的值為 450
+        limit = 450;
+        // 執行查詢或觸發其他操作
+        executeQuery(limit, concurrence,timeRange);
+    });
+
+    $("#limit600").click(function () {
+        // 更新 limit 的值為 600
+        limit = 600;
+        // 執行查詢或觸發其他操作
+        executeQuery(limit, concurrence,timeRange);
+    });
+
+    function executeQuery(limit, concurrence,timeRange) {
+        // 更新可視化組態中的初始Cypher查詢
+        // config.initialCypher = `MATCH p=()-[r]->() WHERE r.concurrency_weight >= ${concurrence} RETURN p LIMIT ${limit}`;
+        switch (timeRange) {
+            case "anytime":
+                cypherQuery = `MATCH p=()-[r]->() WHERE r.concurrency_weight >= ${concurrence} RETURN p LIMIT ${limit}`;
+                break;
+            case "since2023":
+                cypherQuery = `MATCH p=()-[r]->(n) WHERE r.concurrency_weight >= ${concurrence} AND 2023 IN n.years  RETURN p LIMIT ${limit}`;
+                break;
+            case "since2022":
+                cypherQuery = `MATCH p=()-[r]->(n)
+WHERE r.concurrency_weight >= ${concurrence} AND ( 2022 IN n.years OR 2023 IN n.years)
+RETURN p LIMIT ${limit}`;
+                break;
+            case "since2019":
+                cypherQuery = `MATCH p=()-[r]->(n)
+WHERE r.concurrency_weight >= ${concurrence} AND (2019 IN n.years OR 2020 IN n.years OR 2021 IN n.years OR 2022 IN n.years OR 2023 IN n.years)
+RETURN p LIMIT ${limit}`;
+                break;
+        }
+        config.initialCypher = cypherQuery;
+        console.log(config.initialCypher);
+        // 呼叫重新繪製函數
+        draw(config);
+    }
+
+    $(document).ready(function () {
+        // When the slider value changes
+        $("#concurrenceSlider").on("input", function () {
+            concurrence  = $(this).val(); // Get the slider value
+             $("#concurrenceValue").text(concurrence); // Update the displayed value
+            // Execute the query
+            executeQuery(limit, concurrence,timeRange);
+        });
+
+        $(".limit-button").on("click", function() {
+            $("#limitValue").text(limit); // Update the displayed value
+
+            // Execute the query
+        });
+        $("#timeRange").on("change", function() {
+            // Get the selected value from the dropdown
+            timeRange = $(this).val();
+
+            // Execute the query with the selected value
+            executeQuery(limit, concurrence, timeRange);
+        });
+
+        // Function to execute the query
+
+
+        // Calculate the current year
+        // var currentYear = new Date().getFullYear();
+        // $("#currentYear").text(currentYear);
+
+
+
+    });
+</script>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/popper.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,40 +1,589 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-    <title>My Simple Webpage</title>
+    <title>AH 知識圖</title>
+
+    <meta charset="utf-8">
+<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>-->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:350,450,600,600,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/js/bootstrap-multiselect.min.js" integrity="sha512-lxQ4VnKKW7foGFV6L9zlSe+6QppP9B2t+tMMaV4s4iqAv4iHIyXED7O+fke1VeLNaRdoVkVt8Hw/jmZ+XocsXQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/css/bootstrap-multiselect.css" integrity="sha512-tlP4yGOtHdxdeW9/VptIsVMLtgnObNNr07KlHzK4B5zVUuzJ+9KrF86B/a7PJnzxEggPAMzoV/eOipZd8wWpag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style type="text/css">
+        html, body {
+            font: 16pt arial;
+        }
+
+        .custom-padding-button {
+            padding: 3px 6px;
+        }
+
+        #viz {
+            width: 1200px;
+            height: 850px;
+            /*border: 1px solid lightgray;*/
+            font: 12pt arial;
+        }
+
+        h5 {
+            font-size: 16px; /* Adjust the font size as needed */
+        }
+        #pagination{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            place-items: center;
+        }
+
+    </style>
+    <script src="https://unpkg.com/neovis.js@2.0.2"></script>
+<!--    <script-->
+<!--            src="https://code.jquery.com/jquery-3.2.1.min.js"-->
+<!--            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="-->
+<!--            crossorigin="anonymous"></script>-->
+
 </head>
+
 <body>
-    <header>
-        <h1>Welcome to My Webpage</h1>
-    </header>
 
-    <nav>
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-    </nav>
+<!-- Page Content  -->
+<div class="container-fluid">
 
-    <main>
-        <section>
-            <h2>About Us</h2>
-            <p>This is a simple webpage created for demonstration purposes.</p>
-        </section>
+    <div class="row">
+        <div id="viz" class="col-md-9"></div>
+        <nav id="sidebar" class="col-md-3">
+            <div class="p-4 pt-5">
+                <div class="mb-5">
+                    <h5>Keywords:</h5>
+                    <div  class="tagcloud">
+                        <select id="example-dataprovider-optgroups" multiple="multiple"></select>
 
-        <section>
-            <h2>Services</h2>
-            <ul>
-                <li>Web Design</li>
-                <li>Graphic Design</li>
-                <li>Digital Marketing</li>
-            </ul>
-        </section>
-    </main>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <h5>最大顯示數量:<span id="limitValue">350</span></h5>
+                    <div class="btn-group" role="group" aria-label="最大顯示數量">
+                        <button class="btn btn-primary custom-padding-button limit-button" id="limit350">350</button>
+                        <button class="btn btn-primary custom-padding-button limit-button" id="limit450">450</button>
+                        <button class="btn btn-primary custom-padding-button limit-button" id="limit550">550</button>
+                        <button class="btn btn-primary custom-padding-button limit-button" id="limit650">650</button>
+                    </div>
 
-    <footer>
-        <p>&copy; 2023 My Simple Webpage</p>
-    </footer>
+
+                </div>
+
+
+                <div class="mb-3">
+                    <h5>Concurrency:<span id="concurrenceValue" style="color: black;">2</span></h5>
+                    <input type="range" id="concurrenceSlider" name="concurrenceSlider" min="1" max="8" step="1"
+                           value="2">
+                    <!-- Element to display the slider value -->
+                </div>
+                <div class="mb-3">
+                    <h5>Time Range:</h5>
+                    <select id="timeRange">
+                        <option value="anytime">Any time</option>
+                        <option value="since2023">Since 2023</option>
+                        <option value="since2022">Since 2022</option>
+                        <option value="since2019">Since 2019</option>
+                    </select>
+                </div>
+
+                                <div class="mb-3">
+                                    <!--                    <h5>Stabilize:</h5>-->
+                                    <button class="btn btn-primary custom-padding-button" id="stabilize">固定知識圖</button>
+                                </div>
+
+
+
+
+            </div>
+
+
+        </nav>
+        <div class="mb-3">
+            <nav>
+            </nav>
+<!--            <nav id="pagination" aria-label="Page navigation example">-->
+<!--                <ul class="pagination">-->
+<!--                    <li class="page-item disabled" id="previous_page"><a class="page-link" href="#">Previous</a></li>-->
+<!--                    <li class="page-item active"><a class="page-link" href="#">1</a></li>-->
+<!--                    <li class="page-item" id="next_page"><a class="page-link" href="#">Next</a></li>-->
+<!--                </ul>-->
+
+
+<!--            </nav>-->
+        </div>
+
+    </div>
+    <ul class="pagination text-center text-xs-center" id="pagination"></ul>
+
+</div>
+<script src="https://unpkg.com/neo4j-driver"></script>
+
+<script>
+
+
+    var driver = neo4j.driver(
+        'bolt://52.70.223.185:7687',
+        neo4j.auth.basic('neo4j', 'bureaus-millimeter-asterisk')
+    )
+
+    // var session = driver.session()
+
+    class GraphVisualizer {
+        constructor() {
+            this.config = {
+                containerId: "viz",
+                consoleDebug: false,
+                neo4j: {
+                    serverUrl: "bolt://52.70.223.185:7687",
+                    serverUser: "neo4j",
+                    serverPassword: "bureaus-millimeter-asterisk"
+                },
+                visConfig: {
+                    nodes: {
+                        shape: 'dot'
+                    },
+                    edges: {
+                        arrows: {
+                            to: {enabled: true}
+                        }
+                    }
+                },
+                labels: this.createClusterConfigs(),
+                relationships: {
+                    cooccur_other: {value: "concurrency_weight", label: true},
+                    cooccur_low: {value: "concurrency_weight", label: true},
+                    cooccur_very_low: {value: "concurrency_weight", label: true},
+                    cooccur_very_high: {value: "concurrency_weight", label: true},
+                    cooccur_medium: {value: "concurrency_weight", label: true},
+                    cooccur_high: {value: "concurrency_weight", label: true},
+                },
+                initialCypher: `MATCH p=()-[r]->() where r.concurrency_weight>=2 RETURN p LIMIT 350`
+            };
+
+            this.limit = 350;
+            this.concurrency = 2;
+            this.timeRange = "anytime";
+
+            this.viz;
+
+
+        }
+
+
+        createClusterConfigs() {
+            let clusters = {};
+            for (let i = 0; i < 10; i++) {
+                clusters[`cluster_${i}`] = {
+                    value: "frequency",
+                    label: "name",
+                    size: "frequency",
+                    group: "cluster_number"
+                }
+            }
+            ;
+
+            // clusters['title'] = {
+            //     label: "name",
+            // };
+            return clusters;
+        }
+
+        draw() {
+            this.viz = new NeoVis.default(this.config);
+            this.viz.render();
+            console.log(this.viz);
+        }
+
+        executeQuery() {
+            var limit = this.limit;
+            var concurrency = this.concurrency;
+            var timeRange = this.timeRange;
+            var skip = this.limit * (this.current_page - 1);
+            let cypherQuery;
+            switch (timeRange) {
+                case "anytime":
+                    cypherQuery = `MATCH p=()-[r]->(n) WHERE r.concurrency_weight >= ${concurrency} RETURN p ORDER BY n.frequency DESC SKIP ${skip}  LIMIT ${limit} `;
+                    break;
+                case "since2023":
+                    cypherQuery = `MATCH p=()-[r]->(n) WHERE r.concurrency_weight >= ${concurrency} AND 2023 IN n.years  RETURN p ORDER BY n.frequency DESC SKIP ${skip}  LIMIT ${limit} `;
+                    break;
+                case "since2022":
+                    cypherQuery = `MATCH p=()-[r]->(n)
+          WHERE r.concurrency_weight >= ${concurrency} AND ( 2022 IN n.years OR 2023 IN n.years)
+          RETURN p ORDER BY n.frequency DESC SKIP ${skip}  LIMIT ${limit} `;
+                    break;
+                case "since2019":
+                    cypherQuery = `MATCH p=()-[r]->(n)
+          WHERE r.concurrency_weight >= ${concurrency} AND (2019 IN n.years OR 2020 IN n.years OR 2021 IN n.years OR 2022 IN n.years OR 2023 IN n.years)
+          RETURN p ORDER BY n.frequency DESC SKIP ${skip}  LIMIT ${limit} `;
+                    break;
+            }
+            this.config.initialCypher = cypherQuery;
+            console.log(this.config.initialCypher);
+            this.draw();
+        }
+
+        eventListeners() {
+            $("#stabilize").click(() => {
+                this.viz.stabilize();
+            });
+
+            $("#load_all").click(() => {
+                this.limit = 350;
+                this.executeQuery();
+                this.getCount().then(all_count => {
+                    this.total_pages = Math.ceil(all_count / this.limit);
+                    this.current_page = 1;  // initialize current page to 1
+                    this.generatePaginationItems();
+                    this.updatePagination();
+                })
+            });
+
+            $("#limit350").click(() => {
+                this.limit = 350;
+                this.executeQuery();
+                this.getCount().then(all_count => {
+                    this.total_pages = Math.ceil(all_count / this.limit);
+                    this.current_page = 1;  // initialize current page to 1
+                    this.generatePaginationItems();
+                    this.updatePagination();
+                })
+            });
+
+            $("#limit450").click(() => {
+                this.limit = 450;
+                this.executeQuery();
+                this.getCount().then(all_count => {
+                    this.total_pages = Math.ceil(all_count / this.limit);
+                    this.current_page = 1;  // initialize current page to 1
+                    this.generatePaginationItems();
+                    this.updatePagination();
+                })
+            });
+
+            $("#limit550").click(() => {
+                this.limit = 550;
+                this.executeQuery();
+                this.getCount().then(all_count => {
+                    this.total_pages = Math.ceil(all_count / this.limit);
+                    this.current_page = 1;  // initialize current page to 1
+                    this.generatePaginationItems();
+                    this.updatePagination();
+                })
+            });
+
+            $("#limit650").click(() => {
+                this.limit = 650;
+                this.executeQuery();
+                this.getCount().then(all_count => {
+                    this.total_pages = Math.ceil(all_count / this.limit);
+                    this.current_page = 1;  // initialize current page to 1
+                    this.generatePaginationItems();
+                    this.updatePagination();
+                })
+            });
+
+            $("#concurrenceSlider").on("input", (e) => {
+                this.concurrency = $(e.target).val();
+                $("#concurrenceValue").text(this.concurrency);
+                this.executeQuery();
+            });
+
+            $(".limit-button").on("click", () => {
+                $("#limitValue").text(this.limit);
+            });
+
+            $("#timeRange").on("change", (e) => {
+                this.timeRange = $(e.target).val();
+                this.executeQuery();
+            });
+        }
+
+        init() {
+            this.eventListeners();
+            this.draw();
+            const query =
+                `MATCH (n) RETURN COUNT(n) AS count`
+
+            this.getCount = function getCount() {
+                return new Promise((resolve, reject) => {
+                    var session = driver.session()
+                    session
+                        .run(query)
+                        .subscribe({
+                            onNext: record => {
+                                all_count = record.get('count')['low'];
+                                // Generate the page number items
+
+
+                                resolve(all_count);
+                            },
+                            onCompleted: () => {
+                                session.close()
+                            },
+                            onError: error => {
+                                reject(error);
+                            }
+                        })
+                });
+            }
+            var all_count;
+
+            this.getCount().then(all_count => {
+                this.total_pages = Math.ceil(all_count / this.limit);
+                this.current_page = 1;  // initialize current page to 1
+                this.generatePaginationItems();
+                this.updatePagination();
+            })
+            // var selected_keywords;
+            // var keywords_elm = $('#keywords');
+            // keywords_elm.empty();
+
+
+            const session = driver.session();
+
+            session
+                .run(`MATCH (n) WHERE NOT 'title' IN labels(n) AND n.frequency > 3 RETURN n.name, n.cluster_number, n.frequency ORDER BY n.frequency`)
+                .then((result) => {
+                    // Group the records by cluster_number and transfer each group to the desired format
+                    const grouped_by_cluster_number = result.records.reduce((groups, record) => {
+                        const cluster_number = 'cluster_'+record.get('n.cluster_number')
+
+                        if (!groups[cluster_number]) {
+                            groups[cluster_number] = [];
+                        }
+
+                        groups[cluster_number].push({
+                            label: record.get('n.name'),
+                            value: record.get('n.name')
+                        });
+
+                        return groups;
+                    }, {});
+
+                    var optgroups = []
+
+                    for (let cluster_number in grouped_by_cluster_number) {
+                        optgroups.push({
+                            label: cluster_number,
+                            children: grouped_by_cluster_number[cluster_number]
+                        })
+                    }
+
+                    // Here, optgroups is ready
+                    console.log(optgroups);
+                    $('#example-dataprovider-optgroups').multiselect({
+                        maxHeight: 500,
+                        includeSelectAllOption: true,
+                        enableFiltering: true,
+                        enableClickableOptGroups: true,
+                        dropRight: true,
+                        enableCollapsibleOptGroups: true,
+                    }).multiselect('dataprovider', optgroups).multiselect('rebuild');
+
+                    // Remember to close the session and the driver
+                    session.close();
+                    driver.close();
+                })
+
+            // this.getkeywords = function getkeywords() {
+            //     return new Promise((resolve, reject) => {
+            //         var session = driver.session()
+            //         session
+            //             .run(`MATCH (n) WHERE NOT 'title' IN labels(n) RETURN n.name,n.cluster_number order by n.frequency  `)
+            //             .subscribe({
+            //                 onNext: record => {
+            //                     selected_keywords = record.get('n.name');
+            //                     // console.log(selected_keywords);
+            //
+            //                     // keywords_elm.append(`<a href="#" class="tag-cloud-link">${selected_keywords}</a>`)
+            //
+            //                     // resolve(selected_keywords);
+            //                 },
+            //                 onCompleted: () => {
+            //                         $('#example-dataprovider-optgroups').multiselect();
+            //
+            //                         var optgroups = [
+            //                         {
+            //                             label: 'Group 1', children: [
+            //                         {label: 'Option 1.1', value: '1-1'},
+            //                         {label: 'Option 1.2', value: '1-2'},
+            //                         {label: 'Option 1.3', value: '1-3'}
+            //                             ]
+            //                         },
+            //                         {
+            //                             label: 'Group 2', children: [
+            //                         {label: 'Option 2.1', value: '1'},
+            //                         {label: 'Option 2.2', value: '2'},
+            //                         {label: 'Option 2.3', value: '3' }
+            //                             ]
+            //                         }
+            //                         ];
+            //                         $('#example-dataprovider-optgroups').multiselect('dataprovider', optgroups);
+            //
+            //
+            //                     session.close()
+            //                 },
+            //                 onError: error => {
+            //                     reject(error);
+            //                 }
+            //             })
+            //     });
+            // }
+            //
+            // this.getkeywords().then(selected_keywords => {
+            //     this.generatePaginationItems();
+            //     this.updatePagination();
+            // })
+
+            $("#previous_page").click((e) => {
+                e.preventDefault();
+                if (this.current_page > 1) {
+                    this.current_page--;
+                    this.updatePagination();
+                    this.executeQuery();
+                }
+            });
+
+            $("#next_page").click((e) => {
+                e.preventDefault();
+                if (this.current_page < this.total_pages) {
+                    this.current_page++;
+                    this.updatePagination();
+                    this.executeQuery();
+                }
+            });
+
+
+            this.updatePagination = function() {
+                $("#previous_page").parent('li').toggleClass('disabled', this.current_page === 1);
+                $("#next_page").parent('li').toggleClass('disabled', this.current_page === this.total_pages);
+                $("#pagination .page-item.active").removeClass('active');
+                $("#page" + this.current_page).addClass('active');
+            }
+
+
+            this.generateKeywords = function() {
+
+
+
+                // Generate the page number items
+                for (let i = 1; i <= this.total_pages; i++) {
+                    keywords_elm.append('<li class="page-item page-number" id="page' + i + '"><a class="page-link" href="#">' + i + '</a></li>');
+                }
+
+
+                // // Listen for page number item clicks
+                // $(".page-number").click((event) => {
+                //     event.preventDefault();
+                //     var selected_page = parseInt(event.currentTarget.innerText);
+                //     console.log(`selected_page: ${selected_page}`);
+                //     if(!isNaN(selected_page)) {
+                //         this.current_page = selected_page;
+                //         this.updatePagination();
+                //         this.executeQuery();
+                //     }
+                // });
+
+                // $("#previous_page").click((e) => {
+                //     e.preventDefault();
+                //     if (this.current_page > 1) {
+                //         this.current_page--;
+                //         this.updatePagination();
+                //         this.executeQuery();
+                //     }
+                // });
+                //
+                // $("#next_page").click((e) => {
+                //     e.preventDefault();
+                //     if (this.current_page < this.total_pages) {
+                //         this.current_page++;
+                //         this.updatePagination();
+                //         this.executeQuery();
+                //     }
+                // });
+
+
+            }
+
+
+
+            this.generatePaginationItems = function() {
+                var pagination = $('#pagination');
+
+                // Clear existing items
+                pagination.empty();
+
+                // Add the 'previous' button
+                pagination.append('<li class="page-item"><a class="page-link" href="#" id="previous_page">Previous</a></li>');
+
+                // Generate the page number items
+                for (let i = 1; i <= this.total_pages; i++) {
+                    pagination.append('<li class="page-item page-number" id="page' + i + '"><a class="page-link" href="#">' + i + '</a></li>');
+                }
+
+                // Add the 'next' button
+                pagination.append('<li class="page-item"><a class="page-link" href="#" id="next_page">Next</a></li>');
+
+                // Listen for page number item clicks
+                $(".page-number").click((event) => {
+                    event.preventDefault();
+                    var selected_page = parseInt(event.currentTarget.innerText);
+                    console.log(`selected_page: ${selected_page}`);
+                    if(!isNaN(selected_page)) {
+                        this.current_page = selected_page;
+                        this.updatePagination();
+                        this.executeQuery();
+                    }
+                });
+
+                $("#previous_page").click((e) => {
+                    e.preventDefault();
+                    if (this.current_page > 1) {
+                        this.current_page--;
+                        this.updatePagination();
+                        this.executeQuery();
+                    }
+                });
+
+                $("#next_page").click((e) => {
+                    e.preventDefault();
+                    if (this.current_page < this.total_pages) {
+                        this.current_page++;
+                        this.updatePagination();
+                        this.executeQuery();
+                    }
+                });
+
+
+            }
+
+
+
+
+        }
+    }
+
+
+    let graphApp = new GraphVisualizer();
+    window.onload = () => {
+        graphApp.init();
+        $(document).ready(function() {
+            $('#example-getting-started').multiselect();
+        });
+    };
+
+</script>
+
+
 </body>
 </html>
