@@ -131,8 +131,8 @@
 
 
     var driver = neo4j.driver(
-        'bolt://52.70.223.185:7474',
-        neo4j.auth.basic('neo4j', 'bureaus-millimeter-asterisk')
+        'bolt://44.192.61.42:7687',
+        neo4j.auth.basic('neo4j', 'armories-lift-tool')
     )
 
     // var session = driver.session()
@@ -143,7 +143,7 @@
                 containerId: "viz",
                 consoleDebug: false,
                 neo4j: {
-                    serverUrl: "bolt://52.70.223.185:7474",
+                    serverUrl: "bolt://52.70.223.185:7687",
                     serverUser: "neo4j",
                     serverPassword: "bureaus-millimeter-asterisk"
                 },
